@@ -112,6 +112,7 @@ public class ReactionBoard extends JFrame {
                                     int playerWonName = hasAnyOneWon();
                                     if (playerWonName != -1) {
                                         isGameOver=true;
+
                                         JOptionPane.showMessageDialog(ReactionBoard.this,
                                                 "Player " + playerWonName + " Won", "Game Over",
                                                 JOptionPane.INFORMATION_MESSAGE);
