@@ -11,25 +11,63 @@ import javax.swing.JPanel;
 
 public class ReactionBoard extends JFrame {
 	static int player = 1;
-
+	final Cell cellMatrix[][];
+	int row,col;
+	int attemps=0;
 	public void togglePlayer() {
 		if (player == 1)
 			player = 2;
 		else
 			player = 1;
-		setTitle("Player " + player);
+		setTitle("Player " + player+" Chance");
 
 	}
 
+	int hasAnyOneWon(){
+
+		boolean hasPlayer1Cells=false;
+		boolean hasPlayer2Cells=false;
+		int playerInfo=-1;
+		if(attemps<=2){
+			return playerInfo;
+		}
+		for(int i=0;i<row;i++){
+			for(int j=0;j<col;j++){
+				int possesion=cellMatrix[i][j].getCurrentPlayerPossession();
+				if(!hasPlayer1Cells){
+					hasPlayer1Cells=(possesion==1);
+					if(hasPlayer1Cells){
+						playerInfo=1;
+					}
+
+				}
+				if(!hasPlayer2Cells){
+					hasPlayer2Cells=(possesion==2);
+					if(hasPlayer2Cells){
+						playerInfo=2;
+					}
+
+				}
+
+				if(hasPlayer1Cells && hasPlayer2Cells){
+					playerInfo=-1;
+					break;
+				}
+			}
+		}
+		return  playerInfo;
+	}
 	public ReactionBoard(final int cols, final int rows, String title) {
+		this.row=rows;
+		this.col=cols;
 		JPanel p = new JPanel();
 		setSize(300, 300);
 		setTitle("Player "+player);
 		p.setLayout(new GridLayout(rows, cols));
-		final Cell cellMatrix[][] = new Cell[rows][cols];
+		cellMatrix = new Cell[rows][cols];
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++) {
-				final Cell c = new Cell("");
+				final Cell c = new Cell("",this);
 				cellMatrix[i][j] = c;
 				c.setSize(40, 60);
 				p.add(c);
@@ -60,12 +98,18 @@ public class ReactionBoard extends JFrame {
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
+						attemps++;
 						new Thread() {
 							public void run() {
 								if (c.getCount() == 0
 										| (c.getCurrentPlayerPossession() == player)) {
 									c.addBall();
 									togglePlayer();
+									int playerWonName = hasAnyOneWon();
+									if (playerWonName != -1) {
+										resetGame();
+										setTitle("Player "+playerWonName+" Won");
+									}
 								}
 
 							}
@@ -79,10 +123,8 @@ public class ReactionBoard extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				for (int i = 0; i < rows; i++)
-					for (int j = 0; j < cols; j++)
-						cellMatrix[i][j].resetCell();
 
+					resetGame();
 			}
 		});
 		setLayout(new BorderLayout());
@@ -93,4 +135,13 @@ public class ReactionBoard extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
+	void resetGame(){
+		for (int i = 0; i < row; i++)
+			for (int j = 0; j < col; j++)
+				cellMatrix[i][j].resetCell();
+
+		player=2;
+		attemps=0;
+		togglePlayer();
+	}
 }

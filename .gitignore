@@ -2,3 +2,7 @@
 .project
 .settings
 /bin
+.idea
+chainreaction.iml
+*.iml
+*.class
